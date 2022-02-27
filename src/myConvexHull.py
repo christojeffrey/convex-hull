@@ -1,4 +1,3 @@
-from matplotlib.pyplot import axis
 import numpy as np
 from numpy.linalg import norm
 
@@ -7,7 +6,7 @@ pointsReference = []
 def myConvexHull(nppoints):
     global pointsReference
     pointsReference = nppoints.tolist()
-    nppoints = np.unique(nppoints, axis = 0) # hilangkan yang kembar, buang2 resource
+    nppoints = np.unique(nppoints, axis = 0) # hilangkan yang kembar, karena tidak mungkin dua point yang sama ada di dalam hull(dan juga tidak efisien membiarkan point kembar di algoritma)
     points = nppoints.tolist()
     sortPoints(points)
     pointsAbove, pointsBelow = divideFirstPoints(points)
