@@ -1,3 +1,4 @@
+from matplotlib.pyplot import axis
 import numpy as np
 from numpy.linalg import norm
 
@@ -6,6 +7,7 @@ pointsReference = []
 def myConvexHull(nppoints):
     global pointsReference
     pointsReference = nppoints.tolist()
+    nppoints = np.unique(nppoints, axis = 0) # hilangkan yang kembar, buang2 resource
     points = nppoints.tolist()
     sortPoints(points)
     pointsAbove, pointsBelow = divideFirstPoints(points)
@@ -15,20 +17,16 @@ def myConvexHull(nppoints):
 def pointToOriginalIndex(point):
     return pointsReference.index(point)
 
-
 def sortPoints(points):
     quickSort(points, 0, len(points) - 1)
 
 def partition(arr, low, high):
-    i = (low-1)		        # index of smaller element
-    pivot = arr[high]	    # pivot
-
+    i = (low-1) # index of smaller element
+    pivot = arr[high] # pivot
     for j in range(low, high):
-
         # If current element is smaller than or
         # equal to pivot
         if arr[j][0] < pivot[0] or (arr[j][0] == pivot[0] and arr[j][1] < pivot[1]):
-
             # increment index of smaller element
             i = i+1
             arr[i], arr[j] = arr[j], arr[i]
@@ -44,8 +42,6 @@ def quickSort(arr, low, high):
         quickSort(arr, low, pi-1)
         quickSort(arr, pi+1, high)
 
-
-
 def DCConvexHull(points,hull):
     if(len(points) == 2):
         return hull +[[pointToOriginalIndex(points[0]), pointToOriginalIndex(points[1])]]
@@ -54,28 +50,29 @@ def DCConvexHull(points,hull):
         return hull + DCConvexHull(setOfPoints1, hull) + DCConvexHull(setOfPoints2, hull)
 
 def findPmaxIndex(points):
-    p1 = points[0]
-    p2 = points[-1]
     p1= np.array(points[0])
     p2= np.array(points[-1])
     dmax = 0
     dmaxi = 0
     for i in range(0, len(points)):
         p3 = np.array(points[i])
-        d = norm(np.cross(p2-p1, p1-p3))/norm(p2-p1)
-        if(d == dmax):
-            if(angle(p1,p2, p3) > angle(p1, p2, points[dmaxi])):
+        if(norm(p2-p1) != 0):
+            d = norm(np.cross(p2-p1, p1-p3))/norm(p2-p1)
+            if(d == dmax):
+                if(angle(p1,p2, p3) > angle(p1, p2, points[dmaxi])):
+                    dmaxi = i
+                    dmax = d
+
+            elif(d > dmax):
                 dmaxi = i
                 dmax = d
-
-        elif(d > dmax):
-            dmaxi = i
-            dmax = d
     return dmaxi
 
 def angle(p1, p2, p3):
     v1 = (p2[0] - p1[0], p2[1] - p1[1])
     v2 = (p3[0] - p1[0], p3[1] - p1[1])
+    if(np.linalg.norm(v1) == 0 or np.linalg.norm(v2) == 0):
+        return 0
     unit_vector_1 = v1 / np.linalg.norm(v1)
     unit_vector_2 = v2 / np.linalg.norm(v2)
     dot_product = np.dot(unit_vector_1, unit_vector_2)
@@ -111,7 +108,6 @@ def divideCustom(p1, p2, points):
     sortPoints(pointsAbove)
     sortPoints(pointsBelow)
     return pointsAbove, pointsBelow
-
 
 def crossProduct(p1, p2, p3):
     v1 = (p2[0] - p1[0], p2[1] - p1[1])
